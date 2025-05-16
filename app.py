@@ -2,21 +2,28 @@ from flask import Flask, request, jsonify
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import os
-import subprocess
+from download_model import download_model
 
-# Download model if missing
+# Step 1: Ensure model is present
 if not os.path.exists("ai_code_critic_5000"):
-    subprocess.run(["python", "download_model.py"], check=True)
+    print("🚨 Model not found. Downloading...")
+    download_model()
+else:
+    print("✅ Model folder already present.")
 
-# Load model + tokenizer
+# Step 2: Load model and tokenizer
 model_path = "ai_code_critic_5000"
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
-# Flask app
+# Step 3: Initialize Flask app
 app = Flask(__name__)
+
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({"message": "AI Code Critic is live."})
 
 @app.route("/analyze", methods=["POST"])
 def analyze():

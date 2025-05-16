@@ -1,26 +1,28 @@
 import os
 import subprocess
+import zipfile
+
+def install_gdown():
+    try:
+        import gdown
+    except ImportError:
+        subprocess.run(["pip", "install", "gdown"], check=True)
 
 def download_model():
+    install_gdown()
+    import gdown  # Import after installing
+
     url = "https://drive.google.com/uc?id=1um2ngcJ3BwSQVBmYsMceYM5IuOembqKR"
     output = "model.zip"
 
-    print("⬇️ Downloading model zip from Google Drive...")
-    try:
-        subprocess.run(["wget", url, "-O", output], check=True)
-    except subprocess.CalledProcessError:
-        print("❌ Failed to download model from Google Drive.")
-        return
+    print("⬇️ Downloading model...")
+    gdown.download(url, output, quiet=False)
 
     print("📦 Extracting model...")
-    try:
-        subprocess.run(["unzip", "-o", output, "-d", "ai_code_critic_5000"], check=True)
-    except subprocess.CalledProcessError:
-        print("❌ Failed to unzip model archive.")
-        return
-
+    with zipfile.ZipFile(output, 'r') as zip_ref:
+        zip_ref.extractall("ai_code_critic_5000")
     os.remove(output)
-    print("✅ Model ready.")
+    print("✅ Model is ready.")
 
 if __name__ == "__main__":
     download_model()

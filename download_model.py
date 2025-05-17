@@ -1,28 +1,21 @@
-import os
-import subprocess
+import gdown
 import zipfile
+import os
 
-def install_gdown():
-    try:
-        import gdown
-    except ImportError:
-        subprocess.run(["pip", "install", "gdown"], check=True)
+# Direct Google Drive download URL (replace with your file ID)
+url = "https://drive.google.com/uc?id=1um2ngcJ3BwSQVBmYsMceYM5IuOembqKR"
+zip_path = "model.zip"
+model_folder = "ai_code_critic_5000"
 
-def download_model():
-    install_gdown()
-    import gdown  # Import after installing
-
-    url = "https://drive.google.com/uc?id=1um2ngcJ3BwSQVBmYsMceYM5IuOembqKR"
-    output = "model.zip"
-
-    print("⬇️ Downloading model...")
-    gdown.download(url, output, quiet=False)
+if not os.path.exists(model_folder):
+    print("⬇️ Downloading model from Google Drive...")
+    gdown.download(url, zip_path, quiet=False)
 
     print("📦 Extracting model...")
-    with zipfile.ZipFile(output, 'r') as zip_ref:
-        zip_ref.extractall("ai_code_critic_5000")
-    os.remove(output)
-    print("✅ Model is ready.")
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(model_folder)
 
-if __name__ == "__main__":
-    download_model()
+    os.remove(zip_path)
+    print("✅ Model downloaded and ready.")
+else:
+    print("✅ Model already exists. Skipping download.")
